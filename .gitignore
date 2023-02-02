@@ -1,0 +1,7 @@
+.idea
+.github
+
+/node_modules
+
+/secretConfigs.js
+uploads/*

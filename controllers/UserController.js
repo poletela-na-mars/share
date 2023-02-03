@@ -3,6 +3,24 @@ import UserModel from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import { secretHashKey } from '../secretConfigs.js';
 
+const sendTokenAndUserDataResp = (user, res) => {
+    const token = jwt.sign({
+            _id: user._id,
+        },
+        secretHashKey,
+        {
+            expiresIn: '30d',
+        },
+    );
+
+    const {passwordHash, ...userData} = user._doc;
+
+    return res.json({
+        ...userData,
+        token,
+    });
+};
+
 export const register = async (req, res) => {
     try {
         const password = req.body.password;
@@ -19,21 +37,7 @@ export const register = async (req, res) => {
 
         const user = await doc.save();
 
-        const token = jwt.sign({
-                _id: user._id,
-            },
-            secretHashKey,
-            {
-                expiresIn: '30d',
-            },
-        );
-
-        const {passwordHash, ...userData} = user._doc;
-
-        res.json({
-            ...userData,
-            token,
-        });
+        sendTokenAndUserDataResp(user, res);
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -58,25 +62,8 @@ export const login = async (req, res) => {
                 message: 'Неверный логин или пароль',
             });
         }
-        //TODO - generalize errors (неверный логин или пароль)
 
-        const token = jwt.sign({
-                _id: user._id,
-            },
-            secretHashKey,
-            {
-                expiresIn: '30d',
-            },
-        );
-
-        const {passwordHash, ...userData} = user._doc;
-
-        res.json({
-            ...userData,
-            token,
-        });
-
-        //TODO - вынести общий блок кода
+        sendTokenAndUserDataResp(user, res);
     } catch (err) {
         console.error(err);
         res.status(500).json({

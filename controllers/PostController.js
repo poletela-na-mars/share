@@ -1,9 +1,15 @@
 import PostModel from '../models/Post.js';
 
+//TODO: -нужно ли оставить свойство user в response?
+
 export const getAll = async (req, res) => {
     try {
-        //TODO -убрать passwordHash
         const posts = await PostModel.find().populate('user').exec();
+
+        posts.forEach((post) => {
+            post.user.passwordHash = '';
+        });
+
         res.json(posts);
     } catch (err) {
         console.error(err);
@@ -40,6 +46,7 @@ export const getOne = async (req, res) => {
                     });
                 }
 
+                doc.user.passwordHash = '';
                 res.json(doc);
             },
         );

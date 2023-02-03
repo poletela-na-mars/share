@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
+import helmet from 'helmet';
 
 import { PostController, UserController } from './controllers/index.js';
 
@@ -11,10 +12,11 @@ import { loginValidation, postCreateValidation, registerValidation } from './val
 
 mongoose.set('strictQuery', true);
 mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/blog-share?retryWrites=true&w=majority`)
-    .then(() => console.log('DB ok'))
+    .then(() => console.log('DB OK'))
     .catch((err) => console.error('DB error', err));
 
 const app = express();
+app.use(helmet());
 
 //TODO -менять название файла. проверки расширений, ошибки
 const storage = multer.diskStorage({

@@ -8,7 +8,7 @@ import { PostController, UserController } from './controllers/index.js';
 import { adminPass } from './secretConfigs.js';
 
 import { checkAuth, handleValidationErrors } from './utils/index.js';
-import { loginValidation, postCreateValidation, registerValidation } from './validations.js';
+import { loginValidation, postCreateValidation, registerValidation, fileFilter } from './validations.js';
 
 mongoose.set('strictQuery', true);
 mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/blog-share?retryWrites=true&w=majority`)
@@ -18,17 +18,19 @@ mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/
 const app = express();
 app.use(helmet());
 
-//TODO -менять название файла. проверки расширений, ошибки
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
         cb(null, 'uploads');
     },
-    filename: (_, file, cb) => {
-        cb(null, file.originalname);
+    filename: (req, file, cb) => {
+        let extArray = file.mimetype.split("/");
+        let extension = extArray[extArray.length - 1];
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `${file.fieldname}-${uniqueSuffix}.${extension}`);
     },
 });
 
-const upload = multer({storage});
+const upload = multer({storage, fileFilter: fileFilter});
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -38,8 +40,14 @@ app.post('/auth/register', registerValidation, handleValidationErrors, UserContr
 app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+    if (req.fileValidationError) {
+        return res.status(400).json({
+            message: req.fileValidationError,
+        });
+    }
+
     res.json({
-        url: `/uploads/${req.file.originalname}`,
+        url: `/uploads/${req.file.filename}`,
     });
 });
 

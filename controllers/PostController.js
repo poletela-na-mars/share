@@ -1,14 +1,34 @@
 import PostModel from '../models/Post.js';
 
 //TODO: -нужно ли оставить свойство user в response?
+//TODO: -убрать passwordHash
+
+export const getLastTags = async (req, res) => {
+    try {
+        const posts = await PostModel.find().limit(5).exec();
+
+        const tags = posts.flatMap((obj) => obj.tags).slice(0, 5);
+
+        // posts.forEach((post) => {
+        //     post.user.passwordHash = '';
+        // });
+
+        res.json(tags);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Не удалось получить теги',
+        });
+    }
+};
 
 export const getAll = async (req, res) => {
     try {
         const posts = await PostModel.find().populate('user').exec();
 
-        posts.forEach((post) => {
-            post.user.passwordHash = '';
-        });
+        // posts.forEach((post) => {
+        //     post.user.passwordHash = '';
+        // });
 
         res.json(posts);
     } catch (err) {
@@ -46,10 +66,10 @@ export const getOne = async (req, res) => {
                     });
                 }
 
-                doc.user.passwordHash = '';
+                // doc.user.passwordHash = '';
                 res.json(doc);
             },
-        );
+        ).populate('user');
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -114,7 +134,7 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
     try {
-        const postId = req.params.userId;
+        const postId = req.params.id;
 
         await PostModel.updateOne({
                 _id: postId,

@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
 import helmet from 'helmet';
+import cors from 'cors';
 
 import { PostController, UserController } from './controllers/index.js';
 
@@ -16,7 +17,19 @@ mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/
     .catch((err) => console.error('DB error', err));
 
 const app = express();
-app.use(helmet());
+// app.use(helmet());
+// app.use(
+//     helmet({
+//         crossOriginEmbedderPolicy: false,
+//     })
+// );
+
+app.use(
+    helmet({
+        crossOriginResourcePolicy: false,
+        crossOriginEmbedderPolicy: false,
+    })
+);
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
@@ -33,6 +46,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage, fileFilter: fileFilter});
 
 app.use(express.json());
+app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
 app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login);
@@ -51,7 +65,11 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     });
 });
 
+app.get('/tags', PostController.getLastTags);
+
+
 app.get('/posts', PostController.getAll);
+app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);

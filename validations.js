@@ -32,7 +32,8 @@ export const postCreateValidation = [
         .withMessage('Слишком короткий или длинный заголовок').isString(),
     body('text', 'Введите текст статьи').isLength({min: 3, max: 500})
         .withMessage('Слишком короткая или длинная статья').isString(),
-    body('tags', 'Неверный формат тэгов').optional().isString(),
+    // body('tags', 'Неверный формат тегов').optional().isString().matches(/(([#-_+*."'`;:№$%^&]{0,2}[А-яЁёA-Za-z\d]{1,20}[#-_+*."'`;:№$%^&]{0,2})\s*,*\s*)+/),
+    body('tags', 'Неверный формат тегов').optional(),
     body('imageUrl', 'Некорректная ссылка на изображение').optional().isString(),
 ];
 

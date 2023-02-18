@@ -2,10 +2,11 @@ import PostModel from '../models/Post.js';
 
 //TODO: -нужно ли оставить свойство user в response?
 //TODO: -убрать passwordHash
+//TODO: -!удалять фотки из uploads при удалении/редактировании статьи
 
 export const getLastTags = async (req, res) => {
     try {
-        const NUMBER_OF_VISIBLE_TAGS = 15;
+        const NUMBER_OF_VISIBLE_TAGS = 100;
         const posts = await PostModel.find().limit(NUMBER_OF_VISIBLE_TAGS).exec();
 
         const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
@@ -25,9 +26,20 @@ export const getLastTags = async (req, res) => {
 
 export const getAll = async (req, res) => {
     try {
-        const posts = await PostModel.find().sort({
-            createdAt: -1
-        }).populate('user').exec();
+        let sortQuery;
+
+        console.log(req.query.sort);
+
+        if (req.query.sort === 'new') {
+            sortQuery = {
+                createdAt: -1,
+            }
+        } else if (req.query.sort === 'popular') {
+            sortQuery = {
+                viewsCount: -1,
+            }
+        }
+        const posts = await PostModel.find().sort(sortQuery).populate('user').exec();
 
         // posts.forEach((post) => {
         //     post.user.passwordHash = '';

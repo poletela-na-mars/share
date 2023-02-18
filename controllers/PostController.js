@@ -148,6 +148,7 @@ export const update = async (req, res) => {
                 imageUrl: req.body.imageUrl,
                 user: req.userId,
                 tags: req.body.tags,
+                wasEdited: new Date(),
             },
         );
 

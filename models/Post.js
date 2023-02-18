@@ -24,6 +24,10 @@ const PostSchema = new mongoose.Schema({
             required: true,
         },
         imageUrl: String,
+        wasEdited: {
+            type: Date,
+            default: '',
+        },
     },
     {
         timestamps: true,

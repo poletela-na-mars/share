@@ -5,9 +5,10 @@ import PostModel from '../models/Post.js';
 
 export const getLastTags = async (req, res) => {
     try {
-        const posts = await PostModel.find().limit(5).exec();
+        const NUMBER_OF_VISIBLE_TAGS = 15;
+        const posts = await PostModel.find().limit(NUMBER_OF_VISIBLE_TAGS).exec();
 
-        const tags = posts.flatMap((obj) => obj.tags).slice(0, 5);
+        const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
 
         // posts.forEach((post) => {
         //     post.user.passwordHash = '';
@@ -24,7 +25,9 @@ export const getLastTags = async (req, res) => {
 
 export const getAll = async (req, res) => {
     try {
-        const posts = await PostModel.find().populate('user').exec();
+        const posts = await PostModel.find().sort({
+            createdAt: -1
+        }).populate('user').exec();
 
         // posts.forEach((post) => {
         //     post.user.passwordHash = '';

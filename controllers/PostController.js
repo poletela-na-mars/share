@@ -1,8 +1,29 @@
 import PostModel from '../models/Post.js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 //TODO: -нужно ли оставить свойство user в response?
 //TODO: -убрать passwordHash
-//TODO: -!удалять фотки из uploads при удалении/редактировании статьи
+
+const removeImage = (oldImageUrl, res) => {
+    const imageUrl = oldImageUrl;
+    console.log(imageUrl + ' old in remove serv');
+
+    if (imageUrl) {
+        const re = /uploads\/.*/;
+        const relPath = imageUrl.match(re);
+        const oldPath = path.join(relPath[0]);
+        console.log(oldPath);
+        fs.unlink(oldPath, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    message: 'Не удалось удалить изображение',
+                });
+            }
+        });
+    }
+};
 
 export const getLastTags = async (req, res) => {
     try {
@@ -27,8 +48,6 @@ export const getLastTags = async (req, res) => {
 export const getAll = async (req, res) => {
     try {
         let sortQuery;
-
-        console.log(req.query.sort);
 
         if (req.query.sort === 'new') {
             sortQuery = {
@@ -97,6 +116,26 @@ export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
 
+        // const imageUrl = req.body.imageUrl;
+        // console.log(imageUrl);
+        //
+        // if (imageUrl) {
+        //     const re = /uploads\/.*/;
+        //     const relPath = imageUrl.match(re);
+        //     const oldPath = path.join(relPath[0]);
+        //     console.log(oldPath);
+        //     fs.unlink(oldPath, (err) => {
+        //         if (err) {
+        //             console.error(err);
+        //             return res.status(500).json({
+        //                 message: 'Не удалось удалить изображение',
+        //             });
+        //         }
+        //     });
+        // }
+
+        removeImage(req.body.imageUrl, res);
+
         PostModel.findOneAndDelete({
                 _id: postId,
             },
@@ -150,6 +189,30 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const postId = req.params.id;
+
+        // const imageUrl = req.body.imageUrl;
+        // console.log(imageUrl);
+        //
+        // if (imageUrl) {
+        //     const re = /uploads\/.*/;
+        //     const relPath = imageUrl.match(re);
+        //     const oldPath = path.join(relPath[0]);
+        //     console.log(oldPath);
+        //     fs.unlink(oldPath, (err) => {
+        //         if (err) {
+        //             console.error(err);
+        //             return res.status(500).json({
+        //                 message: 'Не удалось удалить изображение',
+        //             });
+        //         }
+        //     });
+        // }
+        //
+
+        console.log(req.body.oldImageUrl + ' server oldimg');
+        if (req.body.oldImageUrl) {
+            removeImage(req.body.oldImageUrl, res);
+        }
 
         await PostModel.updateOne({
                 _id: postId,

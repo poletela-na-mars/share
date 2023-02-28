@@ -17,12 +17,6 @@ mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/
     .catch((err) => console.error('DB error', err));
 
 const app = express();
-// app.use(helmet());
-// app.use(
-//     helmet({
-//         crossOriginEmbedderPolicy: false,
-//     })
-// );
 
 app.use(
     helmet({
@@ -67,9 +61,8 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 
 app.get('/tags', PostController.getLastTags);
 
-
 app.get('/posts', PostController.getAll);
-app.get('/posts/tags', PostController.getLastTags);
+// app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);

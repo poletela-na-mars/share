@@ -13,7 +13,6 @@ const removeImage = (oldImageUrl, res) => {
         const re = /uploads\/.*/;
         const relPath = imageUrl.match(re);
         const oldPath = path.join(relPath[0]);
-        console.log(oldPath);
         fs.unlink(oldPath, (err) => {
             if (err) {
                 console.error(err);
@@ -47,18 +46,39 @@ export const getLastTags = async (req, res) => {
 
 export const getAll = async (req, res) => {
     try {
-        let sortQuery;
+        let sortQuery = {
+            createdAt: -1,
+        };
+        let selectedTag;
 
-        if (req.query.sort === 'new') {
-            sortQuery = {
-                createdAt: -1,
-            }
-        } else if (req.query.sort === 'popular') {
-            sortQuery = {
-                viewsCount: -1,
-            }
+        // if (req.query.sort === 'new') {
+        //     sortQuery = {
+        //         createdAt: -1,
+        //     }
+        // } else if (req.query.sort === 'popular') {
+        //     sortQuery = {
+        //         viewsCount: -1,
+        //     }
+        // }
+
+        const reqSort = req.query.sort;
+
+        switch (reqSort) {
+            case 'new':
+                break;
+            case 'popular':
+                sortQuery = {
+                    viewsCount: -1,
+                };
+                break;
+            case 'tag':
+                selectedTag = {
+                    tags: req.query.tag,
+                };
+                break;
         }
-        const posts = await PostModel.find().sort(sortQuery).populate('user').exec();
+
+        const posts = await PostModel.find(selectedTag).sort(sortQuery).populate('user').exec();
 
         // posts.forEach((post) => {
         //     post.user.passwordHash = '';
@@ -81,7 +101,7 @@ export const getOne = async (req, res) => {
                 _id: postId,
             },
             {
-                $inc: {viewsCount: 1}
+                $inc: { viewsCount: 1 }
             },
             {
                 returnDocument: 'after',

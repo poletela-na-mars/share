@@ -13,7 +13,7 @@ const sendTokenAndUserDataResp = (user, res) => {
         },
     );
 
-    const {passwordHash, ...userData} = user._doc;
+    const { passwordHash, ...userData } = user._doc;
 
     return res.json({
         ...userData,
@@ -48,7 +48,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const user = await UserModel.findOne({email: req.body.email});
+        const user = await UserModel.findOne({ email: req.body.email });
 
         if (!user) {
             return res.status(404).json({
@@ -82,9 +82,11 @@ export const getMe = async (req, res) => {
             });
         }
 
-        const {passwordHash, ...userData} = user._doc;
+        const { passwordHash, ...userData } = user._doc;
 
-        res.json({...userData});
+        const data = { ...userData };
+
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).json({

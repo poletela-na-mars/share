@@ -1,6 +1,7 @@
 import PostModel from '../models/Post.js';
 import * as fs from 'fs';
 import * as path from 'path';
+import mongoose from 'mongoose';
 
 //TODO: -нужно ли оставить свойство user в response?
 //TODO: -убрать passwordHash
@@ -27,7 +28,7 @@ const removeImage = (oldImageUrl, res) => {
 export const getLastTags = async (req, res) => {
     try {
         const NUMBER_OF_VISIBLE_TAGS = 100;
-        const posts = await PostModel.find().limit(NUMBER_OF_VISIBLE_TAGS).exec();
+        const posts = await PostModel.find().sort({ createdAt: -1 }).limit(NUMBER_OF_VISIBLE_TAGS).exec();
 
         const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
 
@@ -50,16 +51,6 @@ export const getAll = async (req, res) => {
             createdAt: -1,
         };
         let selectedTag;
-
-        // if (req.query.sort === 'new') {
-        //     sortQuery = {
-        //         createdAt: -1,
-        //     }
-        // } else if (req.query.sort === 'popular') {
-        //     sortQuery = {
-        //         viewsCount: -1,
-        //     }
-        // }
 
         const reqSort = req.query.sort;
 
@@ -229,7 +220,6 @@ export const update = async (req, res) => {
         // }
         //
 
-        console.log(req.body.oldImageUrl + ' server oldimg');
         if (req.body.oldImageUrl) {
             removeImage(req.body.oldImageUrl, res);
         }
@@ -254,6 +244,40 @@ export const update = async (req, res) => {
         console.error(err);
         res.status(500).json({
             message: 'Не удалось обновить статью',
+        });
+    }
+};
+
+export const createComment = async (req, res) => {
+    try {
+        const postId = mongoose.Types.ObjectId(req.params.id);
+        // console.log(mongoose.Types.ObjectId(req.params.id.trim()));
+        // console.log(req.params.id);
+        // console.log(mongoose.Types.ObjectId.isValid(req.params.id));
+
+        await PostModel.updateOne({
+                _id: postId,
+            },
+            {
+                $push: {
+                    comments: {
+                        author: req.body.author,
+                        date: new Date(),
+                        text: req.body.text,
+                    },
+                },
+                $inc: { commentsCount: 1 },
+                returnDocument: 'after',
+            },
+        );
+
+        res.json({
+            success: true,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Не удалось создать комментарий',
         });
     }
 };

@@ -37,6 +37,11 @@ export const postCreateValidation = [
     body('imageUrl', 'Некорректная ссылка на изображение').optional().isString(),
 ];
 
+export  const commentCreateValidation = [
+    body('text', 'Введите текст комментария').isLength({min: 1, max: 100})
+        .withMessage('Слишком короткий или длинный комментарий').isString(),
+];
+
 export const fileFilter = (req, file, cb) => {
     const maxSize = 5 * 1024 * 1024; // 5MB
     const minSize = 5 * 1024;

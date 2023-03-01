@@ -9,7 +9,13 @@ import { PostController, UserController } from './controllers/index.js';
 import { adminPass } from './secretConfigs.js';
 
 import { checkAuth, handleValidationErrors } from './utils/index.js';
-import { loginValidation, postCreateValidation, registerValidation, fileFilter } from './validations.js';
+import {
+    loginValidation,
+    postCreateValidation,
+    registerValidation,
+    commentCreateValidation,
+    fileFilter
+} from './validations.js';
 
 mongoose.set('strictQuery', true);
 mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/blog-share?retryWrites=true&w=majority`)
@@ -37,7 +43,7 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({storage, fileFilter: fileFilter});
+const upload = multer({ storage, fileFilter: fileFilter });
 
 app.use(express.json());
 app.use(cors());
@@ -60,9 +66,9 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 });
 
 app.get('/tags', PostController.getLastTags);
+app.post('/posts/:id', checkAuth, commentCreateValidation, handleValidationErrors, PostController.createComment);
 
 app.get('/posts', PostController.getAll);
-// app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);

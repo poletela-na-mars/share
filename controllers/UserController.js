@@ -41,7 +41,7 @@ export const register = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Не удалось зарегистрировать пользователя',
+            message: 'Проблемы на стороне сервера. Попробуйте позже',
         });
     }
 };
@@ -51,15 +51,15 @@ export const login = async (req, res) => {
         const user = await UserModel.findOne({ email: req.body.email });
 
         if (!user) {
-            return res.status(404).json({
-                message: 'Пользователь не найден',
+            return res.status(400).json({
+                message: 'Неверный e-mail или пароль',
             });
         }
 
         const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
         if (!isValidPass) {
             return res.status(400).json({
-                message: 'Неверный логин или пароль',
+                message: 'Неверный e-mail или пароль',
             });
         }
 
@@ -67,7 +67,7 @@ export const login = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Не удалось авторизовать пользователя',
+            message: 'Проблемы на стороне сервера. Попробуйте позже',
         });
     }
 };

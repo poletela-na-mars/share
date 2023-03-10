@@ -3,9 +3,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import mongoose from 'mongoose';
 
-//TODO: -нужно ли оставить свойство user в response?
-//TODO: -убрать passwordHash
-
 const removeImage = (oldImageUrl, res) => {
     const imageUrl = oldImageUrl;
     console.log(imageUrl + ' old in remove serv');
@@ -31,10 +28,6 @@ export const getLastTags = async (req, res) => {
         const posts = await PostModel.find().sort({ createdAt: -1 }).limit(NUMBER_OF_VISIBLE_TAGS).exec();
 
         const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
-
-        // posts.forEach((post) => {
-        //     post.user.passwordHash = '';
-        // });
 
         res.json(tags);
     } catch (err) {
@@ -69,11 +62,7 @@ export const getAll = async (req, res) => {
                 break;
         }
 
-        const posts = await PostModel.find(selectedTag).sort(sortQuery).populate('user').exec();
-
-        // posts.forEach((post) => {
-        //     post.user.passwordHash = '';
-        // });
+        let posts = await PostModel.find(selectedTag).sort(sortQuery).populate('user').exec();
 
         res.json(posts);
     } catch (err) {
@@ -98,16 +87,16 @@ export const getOne = async (req, res) => {
                 returnDocument: 'after',
             },
             (err, doc) => {
+                if (!doc) {
+                    return res.status(404).json({
+                        message: 'Статья не найдена',
+                    });
+                }
+
                 if (err) {
                     console.error(err);
                     return res.status(500).json({
                         message: 'Не удалось вернуть статью',
-                    });
-                }
-
-                if (!doc) {
-                    return res.status(404).json({
-                        message: 'Статья не найдена',
                     });
                 }
 
@@ -126,24 +115,6 @@ export const getOne = async (req, res) => {
 export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
-
-        // const imageUrl = req.body.imageUrl;
-        // console.log(imageUrl);
-        //
-        // if (imageUrl) {
-        //     const re = /uploads\/.*/;
-        //     const relPath = imageUrl.match(re);
-        //     const oldPath = path.join(relPath[0]);
-        //     console.log(oldPath);
-        //     fs.unlink(oldPath, (err) => {
-        //         if (err) {
-        //             console.error(err);
-        //             return res.status(500).json({
-        //                 message: 'Не удалось удалить изображение',
-        //             });
-        //         }
-        //     });
-        // }
 
         removeImage(req.body.imageUrl, res);
 
@@ -192,7 +163,7 @@ export const create = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Не удалось создать статью',
+            message: 'Ошибка при создании статьи.\nПерезагрузите страницу и попробуйте снова.',
         });
     }
 };
@@ -200,25 +171,6 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const postId = req.params.id;
-
-        // const imageUrl = req.body.imageUrl;
-        // console.log(imageUrl);
-        //
-        // if (imageUrl) {
-        //     const re = /uploads\/.*/;
-        //     const relPath = imageUrl.match(re);
-        //     const oldPath = path.join(relPath[0]);
-        //     console.log(oldPath);
-        //     fs.unlink(oldPath, (err) => {
-        //         if (err) {
-        //             console.error(err);
-        //             return res.status(500).json({
-        //                 message: 'Не удалось удалить изображение',
-        //             });
-        //         }
-        //     });
-        // }
-        //
 
         if (req.body.oldImageUrl) {
             removeImage(req.body.oldImageUrl, res);
@@ -243,7 +195,7 @@ export const update = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Не удалось обновить статью',
+            message: 'Ошибка при обновлении статьи.\nПерезагрузите страницу и попробуйте снова.',
         });
     }
 };
@@ -251,9 +203,6 @@ export const update = async (req, res) => {
 export const createComment = async (req, res) => {
     try {
         const postId = mongoose.Types.ObjectId(req.params.id);
-        // console.log(mongoose.Types.ObjectId(req.params.id.trim()));
-        // console.log(req.params.id);
-        // console.log(mongoose.Types.ObjectId.isValid(req.params.id));
 
         await PostModel.updateOne({
                 _id: postId,
@@ -277,7 +226,7 @@ export const createComment = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Не удалось создать комментарий',
+            message: 'Ошибка при создании комментария.\nПерезагрузите страницу и попробуйте снова.',
         });
     }
 };

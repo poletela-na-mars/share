@@ -3,9 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import mongoose from 'mongoose';
 
+const NUMBER_OF_VISIBLE_TAGS = 100;
+
 const removeImage = (oldImageUrl, res) => {
     const imageUrl = oldImageUrl;
-    console.log(imageUrl + ' old in remove serv');
 
     if (imageUrl) {
         const re = /uploads\/.*/;
@@ -24,9 +25,7 @@ const removeImage = (oldImageUrl, res) => {
 
 export const getLastTags = async (req, res) => {
     try {
-        const NUMBER_OF_VISIBLE_TAGS = 100;
         const posts = await PostModel.find().sort({ createdAt: -1 }).limit(NUMBER_OF_VISIBLE_TAGS).exec();
-
         const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
 
         res.json(tags);
@@ -100,7 +99,6 @@ export const getOne = async (req, res) => {
                     });
                 }
 
-                // doc.user.passwordHash = '';
                 res.json(doc);
             },
         ).populate('user');

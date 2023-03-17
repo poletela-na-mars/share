@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import helmet from 'helmet';
 import cors from 'cors';
+import fs from 'fs';
 
 import { PostController, UserController } from './controllers/index.js';
 
@@ -26,6 +27,9 @@ app.use(
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
+        if (!fs.existsSync('uploads')) {
+            fs.mkdirSync('uploads');
+        }
         cb(null, 'uploads');
     },
     filename: (req, file, cb) => {

@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import { secretHashKey } from '../secretConfigs.js';
+// import { secretHashKey } from '../secretConfigs.js';
 
 const sendTokenAndUserDataResp = (user, res) => {
     const token = jwt.sign({
             _id: user._id,
         },
-        secretHashKey,
+        process.env.SECRET_HASH_KEY,
         {
             expiresIn: '30d',
         },

@@ -6,18 +6,11 @@ import cors from 'cors';
 
 import { PostController, UserController } from './controllers/index.js';
 
-import { adminPass } from './secretConfigs.js';
-
 import { checkAuth, handleValidationErrors } from './utils/index.js';
-import {
-    postCreateValidation,
-    registerValidation,
-    commentCreateValidation,
-    fileFilter
-} from './validations.js';
+import { commentCreateValidation, fileFilter, postCreateValidation, registerValidation } from './validations.js';
 
 mongoose.set('strictQuery', true);
-mongoose.connect(`mongodb+srv://admin:${adminPass}@cluster0.2otrlsf.mongodb.net/blog-share?retryWrites=true&w=majority`)
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('DB OK'))
     .catch((err) => console.error('DB error', err));
 
@@ -73,7 +66,7 @@ app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, Post
 app.delete('/posts/:id', checkAuth, PostController.remove);
 app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update);
 
-app.listen(4444, (err) => {
+app.listen(process.env.PORT || 4444, (err) => {
     if (err) {
         return console.error(err);
     }

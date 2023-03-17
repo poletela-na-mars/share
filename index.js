@@ -15,6 +15,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch((err) => console.error('DB error', err));
 
 const app = express();
+app.use(cors());
 
 app.use(
     helmet({
@@ -38,7 +39,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, fileFilter: fileFilter });
 
 app.use(express.json());
-app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
 app.post('/auth/login', handleValidationErrors, UserController.login);

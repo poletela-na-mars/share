@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "start:dev": "nodemon index.js",
-    "build": "node build index.js",
-    "build-share": "build-share -s index.js"
+    "build": "node build index.js"
   },
   "keywords": [],
   "author": "",

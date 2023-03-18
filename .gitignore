@@ -4,4 +4,4 @@
 /node_modules
 
 /secretConfigs.js
-uploads/*
+#uploads/*

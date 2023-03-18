@@ -18,6 +18,10 @@ mongoose.connect(process.env.MONGODB_URI)
 const app = express();
 app.use(cors());
 
+app.options('*', ((req, res) =>
+        res.sendStatus(200)
+));
+
 // app.use(
 //     helmet({
 //         crossOriginResourcePolicy: false,

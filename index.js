@@ -18,12 +18,12 @@ mongoose.connect(process.env.MONGODB_URI)
 const app = express();
 app.use(cors());
 
-app.use(
-    helmet({
-        crossOriginResourcePolicy: false,
-        crossOriginEmbedderPolicy: false,
-    })
-);
+// app.use(
+//     helmet({
+//         crossOriginResourcePolicy: false,
+//         crossOriginEmbedderPolicy: false,
+//     })
+// );
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {

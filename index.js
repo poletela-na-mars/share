@@ -54,7 +54,7 @@ app.post('/auth/login', handleValidationErrors, UserController.login);
 app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
-app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
     if (req.fileValidationError) {
         return res.status(400).json({
             message: req.fileValidationError,

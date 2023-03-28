@@ -60,7 +60,7 @@ export const fileFilter = (req, file, cb) => {
     }
 
     if (file.size >= maxSize || file.size <= minSize) {
-        errorMsg = 'Изображение слишком большое или слишком маленькое.';
+        errorMsg = 'Изображение слишком большое или слишком маленькое (должно быть не меньше 5 Кб и не больше 5 Мб).';
         req.fileValidationError = errorMsg;
         return cb(null, false, new Error(errorMsg));
     }

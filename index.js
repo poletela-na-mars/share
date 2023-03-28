@@ -23,12 +23,18 @@ app.options('*', ((req, res) =>
 ));
 // app.options('*', cors());
 
-app.use(
-    helmet({
-        crossOriginResourcePolicy: false,
-        crossOriginEmbedderPolicy: false,
-    })
-);
+// app.use(
+//     helmet({
+//         crossOriginResourcePolicy: false,
+//         crossOriginEmbedderPolicy: false,
+//     })
+// );
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://share-frontend.vercel.app');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {

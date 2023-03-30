@@ -9,6 +9,7 @@ import { PostController, UserController } from './controllers/index.js';
 
 import { checkAuth, handleValidationErrors } from './utils/index.js';
 import { commentCreateValidation, fileFilter, postCreateValidation, registerValidation } from './validations.js';
+import * as path from 'path';
 
 mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI)
@@ -16,11 +17,10 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch((err) => console.error('DB error', err));
 
 const app = express();
-app.use(cors());
 
-app.options('*', ((req, res) =>
-        res.sendStatus(200)
-));
+// app.options('*', ((req, res) =>
+//         res.sendStatus(200)
+// ));
 // app.options('*', cors());
 
 // app.use(
@@ -30,11 +30,11 @@ app.options('*', ((req, res) =>
 //     })
 // );
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://share-frontend.vercel.app');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', 'https://share-frontend.vercel.app');
+//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//     next();
+// });
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
@@ -54,12 +54,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, fileFilter: fileFilter });
 
 app.use(express.json());
+app.use(cors());
+
 app.use('/uploads', express.static('uploads'));
 
 app.post('/auth/login', handleValidationErrors, UserController.login);
 app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
+app.get('/uploads/:image', (req, res) => {
+    res.sendFile(path.join(process.env.REACT_APP_API_URL, '/uploads/:image'));
+});
 app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
     if (req.fileValidationError) {
         return res.status(400).json({
@@ -81,10 +86,12 @@ app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, Post
 app.delete('/posts/:id', checkAuth, PostController.remove);
 app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update);
 
-app.listen(process.env.PORT || 4444, (err) => {
+const port = process.env.PORT || 4444;
+app.listen(port, (err) => {
     if (err) {
         return console.error(err);
     }
 
     console.log('Server OK');
+    console.log(`Server is running on ${port}`);
 });

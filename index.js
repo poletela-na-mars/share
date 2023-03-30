@@ -63,7 +63,7 @@ app.post('/auth/register', registerValidation, handleValidationErrors, UserContr
 app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.get('/uploads/:image', (req, res) => {
-    res.sendFile(path.join(process.env.REACT_APP_API_URL, '/uploads/:image'));
+    res.sendFile(path.join(__dirname, '/uploads/:image'));
 });
 app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
     if (req.fileValidationError) {

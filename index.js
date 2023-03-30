@@ -9,7 +9,6 @@ import { PostController, UserController } from './controllers/index.js';
 
 import { checkAuth, handleValidationErrors } from './utils/index.js';
 import { commentCreateValidation, fileFilter, postCreateValidation, registerValidation } from './validations.js';
-import * as path from 'path';
 
 mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI)
@@ -63,7 +62,7 @@ app.post('/auth/register', registerValidation, handleValidationErrors, UserContr
 app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.get('/uploads/:image', (req, res) => {
-    res.sendFile(path.join(__dirname, '/uploads/:image'));
+    res.sendFile('./uploads/:image');
 });
 app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
     if (req.fileValidationError) {

@@ -61,8 +61,19 @@ app.post('/auth/login', handleValidationErrors, UserController.login);
 app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
-app.get('/uploads/:image', (req, res) => {
-    res.sendFile('./uploads/:image');
+
+app.get('/uploads', (req, res) => {
+    let images = [];
+    fs.readdir('/uploads/', (err, files) => {
+        if (!err) {
+            files.forEach(file => {
+                images.push(file);
+            })
+            res.render('index', { images: images});
+        } else {
+            console.log(err);
+        }
+    });
 });
 app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
     if (req.fileValidationError) {

@@ -38,10 +38,10 @@ const app = express();
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
-        if (!fs.existsSync('uploads')) {
-            fs.mkdirSync('uploads');
+        if (!fs.existsSync(path.resolve(process.cwd(), 'uploads'))) {
+            fs.mkdirSync(path.resolve(process.cwd(), 'uploads'));
         }
-        cb(null, 'uploads');
+        cb(null, path.resolve(process.cwd(), 'uploads'));
     },
     filename: (req, file, cb) => {
         let extArray = file.mimetype.split("/");

@@ -64,7 +64,7 @@ app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.get('/uploads', (req, res) => {
     let images = [];
-    fs.readdir('/uploads/', (err, files) => {
+    fs.readdir('./uploads/', (err, files) => {
         if (!err) {
             files.forEach(file => {
                 images.push(file);

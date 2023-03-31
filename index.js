@@ -69,7 +69,7 @@ app.get('/uploads', (req, res) => {
             files.forEach(file => {
                 images.push(file);
             })
-            res.render('index', { images: images});
+            res.json({ images: images});
         } else {
             console.log(err);
         }

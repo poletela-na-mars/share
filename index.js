@@ -76,12 +76,12 @@ app.get('/auth/me', checkAuth, UserController.getMe);
 //     });
 // });
 
-app.get('/uploads/:imageName', async (req, res) => {
+app.get('/uploads/:imageUrl', async (req, res) => {
     try {
-        const imageName = req.params.imageName;
+        const imageUrl = req.params.imageUrl;
 
         Upload.findOne({
-                fileName: imageName,
+                fileName: imageUrl,
             },
             (err, doc) => {
                 if (!doc) {
@@ -97,7 +97,7 @@ app.get('/uploads/:imageName', async (req, res) => {
                     });
                 }
 
-                res.contentType(doc.contentType);
+                res.contentType(doc.file.contentType);
                 res.json(doc);
             },
         );

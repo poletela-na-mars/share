@@ -97,7 +97,7 @@ app.get('/uploads/:imageUrl', async (req, res) => {
                     });
                 }
 
-                res.contentType(doc.file.contentType);
+                // res.contentType(doc.file.contentType);
                 res.json(doc);
             },
         );

@@ -1,24 +1,56 @@
 import PostModel from '../models/Post.js';
-import * as fs from 'fs';
-import * as path from 'path';
+import Upload from '../models/Upload.js';
 import mongoose from 'mongoose';
 
 const NUMBER_OF_VISIBLE_TAGS = 100;
 
 const removeImage = (oldImageUrl, res) => {
-    const imageUrl = oldImageUrl;
+    // const imageUrl = oldImageUrl;
+    //
+    // if (imageUrl) {
+    //     const re = /uploads\/.*/;
+    //     const relPath = imageUrl.match(re);
+    //     const oldPath = path.join(relPath[0]);
+    //     fs.unlink(oldPath, (err) => {
+    //         if (err) {
+    //             console.error(err);
+    //             return res.status(500).json({
+    //                 message: 'Не удалось удалить изображение',
+    //             });
+    //         }
+    //     });
+    // }
 
-    if (imageUrl) {
-        const re = /uploads\/.*/;
-        const relPath = imageUrl.match(re);
-        const oldPath = path.join(relPath[0]);
-        fs.unlink(oldPath, (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({
-                    message: 'Не удалось удалить изображение',
+    try {
+        const imageUrl = oldImageUrl;
+
+        if (imageUrl) {
+            Upload.findOneAndDelete({
+                    fileName: imageUrl,
+                },
+                (err, doc) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({
+                            message: 'Не удалось удалить изображение',
+                        });
+                    }
+
+                    if (!doc) {
+                        return res.status(404).json({
+                            message: 'Изображение не найдено',
+                        });
+                    }
+
+                    res.json({
+                        success: true,
+                    });
                 });
-            }
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            message: 'Не удалось удалить изображение',
         });
     }
 };

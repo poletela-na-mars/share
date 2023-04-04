@@ -26,7 +26,7 @@ const removeImage = (oldImageUrl, res) => {
 
         if (imageUrl) {
             Upload.findOneAndDelete({
-                    fileName: imageUrl,
+                    fileName: imageUrl.replace('/uploads/', ''),
                 },
                 (err, doc) => {
                     if (err) {

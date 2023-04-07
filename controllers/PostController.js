@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 const NUMBER_OF_VISIBLE_TAGS = 100;
 
-const removeImage = (oldImageUrl, res) => {
+const removeImage = async (oldImageUrl, res) => {
     try {
         const imageUrl = oldImageUrl;
 
@@ -131,8 +131,8 @@ export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
 
-        const removeImageSuccess = removeImage(req.body.imageUrl, res);
-        if (removeImageSuccess === true) {
+        const removeImageSuccess = await removeImage(req.body.imageUrl, res);
+        if (removeImageSuccess === true || removeImageSuccess === undefined) {
             PostModel.findOneAndDelete({
                     _id: postId,
                 },
@@ -192,10 +192,10 @@ export const update = async (req, res) => {
         let removeImageSuccess;
 
         if (req.body.oldImageUrl) {
-            removeImageSuccess = removeImage(req.body.oldImageUrl, res);
+            removeImageSuccess = await removeImage(req.body.oldImageUrl, res);
         }
 
-        if (removeImageSuccess === true) {
+        if (removeImageSuccess === true || removeImageSuccess === undefined) {
             await PostModel.updateOne({
                     _id: postId,
                 },

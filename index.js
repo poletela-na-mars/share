@@ -97,8 +97,7 @@ app.get('/uploads/:imageUrl', async (req, res) => {
                     });
                 }
 
-                // res.contentType(doc.file.contentType);
-                res.json(doc);
+                return res.json(doc);
             },
         );
     } catch (err) {
@@ -133,7 +132,7 @@ app.post('/uploads', checkAuth, upload.single('image'), async (req, res) => {
         const uploadObject = new Upload(imageUploadObject);
         const uploadProcess = await uploadObject.save();
 
-        res.json(uploadProcess);
+        return res.json(uploadProcess);
         // res.json({
         //     url: `/uploads/${req.file?.filename}`,
         // });

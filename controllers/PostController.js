@@ -5,22 +5,6 @@ import mongoose from 'mongoose';
 const NUMBER_OF_VISIBLE_TAGS = 100;
 
 const removeImage = (oldImageUrl, res) => {
-    // const imageUrl = oldImageUrl;
-    //
-    // if (imageUrl) {
-    //     const re = /uploads\/.*/;
-    //     const relPath = imageUrl.match(re);
-    //     const oldPath = path.join(relPath[0]);
-    //     fs.unlink(oldPath, (err) => {
-    //         if (err) {
-    //             console.error(err);
-    //             return res.status(500).json({
-    //                 message: 'Не удалось удалить изображение',
-    //             });
-    //         }
-    //     });
-    // }
-
     try {
         const imageUrl = oldImageUrl;
 
@@ -42,14 +26,14 @@ const removeImage = (oldImageUrl, res) => {
                         });
                     }
 
-                    res.json({
+                    return res.json({
                         success: true,
                     });
                 });
         }
     } catch (err) {
         console.error(err);
-        return res.status(500).json({
+        res.status(500).json({
             message: 'Не удалось удалить изображение',
         });
     }
@@ -165,7 +149,7 @@ export const remove = async (req, res) => {
                     });
                 }
 
-                res.json({
+                return res.json({
                     success: true,
                 });
             });
@@ -219,7 +203,7 @@ export const update = async (req, res) => {
             },
         );
 
-        res.json({
+        return res.json({
             success: true,
         });
     } catch (err) {

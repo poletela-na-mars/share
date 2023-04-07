@@ -26,14 +26,15 @@ const removeImage = (oldImageUrl, res) => {
                         });
                     }
 
-                    return res.json({
-                        success: true,
-                    });
+                    return true;
+                    // return res.json({
+                    //     success: true,
+                    // });
                 });
         }
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Не удалось удалить изображение',
         });
     }
@@ -44,10 +45,10 @@ export const getLastTags = async (req, res) => {
         const posts = await PostModel.find().sort({ createdAt: -1 }).limit(NUMBER_OF_VISIBLE_TAGS).exec();
         const tags = posts.flatMap((obj) => obj.tags).slice(0, NUMBER_OF_VISIBLE_TAGS);
 
-        res.json(tags);
+        return res.json(tags);
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Не удалось получить теги',
         });
     }
@@ -115,12 +116,12 @@ export const getOne = async (req, res) => {
                     });
                 }
 
-                res.json(doc);
+                return res.json(doc);
             },
         ).populate('user');
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Не удалось получить статью',
         });
     }
@@ -130,32 +131,35 @@ export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
 
-        removeImage(req.body.imageUrl, res);
+        const removeImageSuccess = removeImage(req.body.imageUrl, res);
+        if (removeImageSuccess === true) {
+            PostModel.findOneAndDelete({
+                    _id: postId,
+                },
+                (err, doc) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({
+                            message: 'Не удалось удалить статью',
+                        });
+                    }
 
-        PostModel.findOneAndDelete({
-                _id: postId,
-            },
-            (err, doc) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({
-                        message: 'Не удалось удалить статью',
+                    if (!doc) {
+                        return res.status(404).json({
+                            message: 'Статья не найдена',
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
                     });
-                }
-
-                if (!doc) {
-                    return res.status(404).json({
-                        message: 'Статья не найдена',
-                    });
-                }
-
-                return res.json({
-                    success: true,
                 });
-            });
+        } else {
+            return removeImageSuccess;
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Не удалось удалить статью',
         });
     }
@@ -185,30 +189,36 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const postId = req.params.id;
+        let removeImageSuccess;
 
         if (req.body.oldImageUrl) {
-            removeImage(req.body.oldImageUrl, res);
+            removeImageSuccess = removeImage(req.body.oldImageUrl, res);
         }
 
-        await PostModel.updateOne({
-                _id: postId,
-            },
-            {
-                title: req.body.title,
-                text: req.body.text,
-                imageUrl: req.body.imageUrl,
-                user: req.userId,
-                tags: req.body.tags,
-                wasEdited: new Date(),
-            },
-        );
+        if (removeImageSuccess === true) {
+            await PostModel.updateOne({
+                    _id: postId,
+                },
+                {
+                    title: req.body.title,
+                    text: req.body.text,
+                    imageUrl: req.body.imageUrl,
+                    user: req.userId,
+                    tags: req.body.tags,
+                    wasEdited: new Date(),
+                },
+            );
 
-        return res.json({
-            success: true,
-        });
+            return res.json({
+                success: true,
+            });
+        } else {
+            return removeImageSuccess;
+        }
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Ошибка при обновлении статьи.\nПерезагрузите страницу и попробуйте снова.',
         });
     }

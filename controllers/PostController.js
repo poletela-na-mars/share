@@ -130,13 +130,8 @@ export const getOne = async (req, res) => {
 export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
-        let removeImageSuccess;
 
-        if (req.body.imageUrl) {
-            removeImageSuccess = await removeImage(req.body.imageUrl, res);
-        }
-
-        console.log(removeImageSuccess);
+        const removeImageSuccess = await removeImage(req.body.imageUrl, res);
         if (removeImageSuccess === true || removeImageSuccess === undefined) {
             PostModel.findOneAndDelete({
                     _id: postId,

@@ -9,7 +9,7 @@ const removeImage = async (oldImageUrl, res) => {
         const imageUrl = oldImageUrl;
 
         if (imageUrl) {
-            Upload.findOneAndDelete({
+            await Upload.findOneAndDelete({
                     fileName: imageUrl.replace('/uploads/', ''),
                 },
                 (err, doc) => {

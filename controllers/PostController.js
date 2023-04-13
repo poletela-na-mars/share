@@ -9,7 +9,7 @@ const removeImage = async (oldImageUrl, res) => {
         const imageUrl = oldImageUrl;
 
         if (imageUrl) {
-            Upload.findOneAndDelete({
+            await Upload.findOneAndDelete({
                     fileName: imageUrl.replace('/uploads/', ''),
                 },
                 (err, doc) => {
@@ -131,9 +131,12 @@ export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
 
+        console.log(req.body.imageUrl);
         const removeImageSuccess = await removeImage(req.body.imageUrl, res);
+        console.log(removeImageSuccess);
+
         if (removeImageSuccess === true || removeImageSuccess === undefined) {
-            PostModel.findOneAndDelete({
+            await PostModel.findOneAndDelete({
                     _id: postId,
                 },
                 (err, doc) => {

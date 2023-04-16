@@ -1,7 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import helmet from 'helmet';
 import cors from 'cors';
 
 import { PostController, UserController } from './controllers/index.js';
@@ -50,6 +49,9 @@ const storage = multer.memoryStorage();
 //         cb(null, `${file.fieldname}-${uniqueSuffix}.${extension}`);
 //     },
 // });
+
+//TODO - still may be problems with deleting images in posts (while deleting post)
+//     - add image compression
 
 const upload = multer({ storage, fileFilter: fileFilter });
 
